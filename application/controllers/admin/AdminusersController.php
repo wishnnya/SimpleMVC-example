@@ -37,7 +37,6 @@ class AdminusersController extends \ItForFree\SimpleMVC\MVC\Controller
             $this->view->render('user/index.php');
         }
     }
-
     /**
      * Создание нового пользователя
      */
@@ -48,6 +47,12 @@ class AdminusersController extends \ItForFree\SimpleMVC\MVC\Controller
             if (!empty($_POST['saveNewUser'])) {
                 $Adminusers = new UserModel();
                 $newAdminusers = $Adminusers->loadFromArray($_POST);
+                // проверка на активность 
+                if (isset($_POST['active'])) {
+                    $newAdminusers->active = (int)$_POST['active'];
+                } else {
+                    $newAdminusers->active = 0;
+                }
                 // проверка что роль передается при создании
                 if (isset($_POST['role'])) {
                     $newAdminusers->role = $_POST['role'];
@@ -97,6 +102,12 @@ class AdminusersController extends \ItForFree\SimpleMVC\MVC\Controller
                     $newAdminusers->salt = rand(0, 1000000);
                     $saltedPassword = $_POST['pass'] . $newAdminusers->salt;
                     $newAdminusers->pass = password_hash($saltedPassword, PASSWORD_BCRYPT);
+                }
+                // проверка на активность
+                if (isset($_POST['active'])) {
+                    $newAdminusers->active = (int)$_POST['active'];
+                } else {
+                    $newAdminusers->active = 0;
                 }
 
                 $newAdminusers->update();

@@ -5,9 +5,7 @@ use ItForFree\SimpleMVC\Config;
 $Url = Config::getObject('core.router.class');
 $User = Config::getObject('core.user.class');
 ?>
-
 <?php include('includes/admin-users-nav.php'); ?>
-
 
 <h2><?= $editAdminusersTitle ?>
     <span>
@@ -31,6 +29,12 @@ $User = Config::getObject('core.user.class');
     <select name="role" required>
         <option value="admin" <?= $viewAdminusers->role == 'admin' ? 'selected' : '' ?>>Администратор</option>
         <option value="auth_user" <?= $viewAdminusers->role == 'auth_user' ? 'selected' : '' ?>>Зарегистрированный пользователь</option>
+    </select><br>
+    <h5>Пользователь активен?</h5>
+    <label>
+        <input type="checkbox" name="active" value="1" <?= isset($viewAdminusers->active) && $viewAdminusers->active ? 'checked' : '' ?>>
+        Активен
+    </label><br>
     </select><br>
 
     <input type="hidden" name="id" value="<?= $_GET['id']; ?>">

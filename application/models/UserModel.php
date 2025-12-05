@@ -43,6 +43,9 @@ class UserModel extends Model
 
     public $salt = null;
 
+    // свойство активности
+    public int $active = 1;
+
     /**
      * Установить роль пользователя
      */
@@ -65,7 +68,7 @@ class UserModel extends Model
 
     public function insert()
     {
-        $sql = "INSERT INTO $this->tableName (timestamp, login, salt, pass, role, email) VALUES (:timestamp, :login, :salt, :pass, :role, :email)";
+        $sql = "INSERT INTO $this->tableName (timestamp, login, salt, pass, role, email, active) VALUES (:timestamp, :login, :salt, :pass, :role, :email, :active)";
         $st = $this->pdo->prepare($sql);
         $st->bindValue(":timestamp", (new \DateTime('NOW'))->format('Y-m-d H:i:s'), \PDO::PARAM_STMT);
         $st->bindValue(":login", $this->login, \PDO::PARAM_STR);
@@ -81,13 +84,16 @@ class UserModel extends Model
 
         $st->bindValue(":role", $this->role, \PDO::PARAM_STR); // ДОБАВЛЕНО: сохраняем роль
         $st->bindValue(":email", $this->email, \PDO::PARAM_STR);
+        // активный пользователь
+        $st->bindValue(":active", $this->active, \PDO::PARAM_INT);
+        
         $st->execute();
         $this->id = $this->pdo->lastInsertId();
     }
 
     public function update()
     {
-        $sql = "UPDATE $this->tableName SET timestamp=:timestamp, login=:login, role=:role, email=:email, pass=:pass, salt=:salt";
+        $sql = "UPDATE $this->tableName SET timestamp=:timestamp, login=:login, role=:role, email=:email, pass=:pass, salt=:salt, active=:active";
         $sql .= " WHERE id = :id";
 
         $st = $this->pdo->prepare($sql);
@@ -97,6 +103,8 @@ class UserModel extends Model
         $st->bindValue(":email", $this->email, \PDO::PARAM_STR);
         $st->bindValue(":pass", $this->pass, \PDO::PARAM_STR);
         $st->bindValue(":salt", $this->salt, \PDO::PARAM_STR);
+        // активный пользователь
+         $st->bindValue(":active", $this->active, \PDO::PARAM_INT);
         $st->bindValue(":id", $this->id, \PDO::PARAM_INT);
         $st->execute(); 
 
@@ -126,7 +134,7 @@ class UserModel extends Model
      */
     public function getAuthData($login): ?array
     {
-        $sql = "SELECT salt, pass FROM users WHERE login = :login";
+        $sql = "SELECT salt, pass, active FROM users WHERE login = :login";
         $st = $this->pdo->prepare($sql);
         $st->bindValue(":login", $login, \PDO::PARAM_STR);
         $st->execute();
